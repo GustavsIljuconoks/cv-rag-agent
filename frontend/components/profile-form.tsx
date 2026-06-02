@@ -1,19 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-type Profile = {
-  id: number;
-  summary: string | null;
-  preferred_roles: string | null;
-  preferred_locations: string | null;
-  preferred_remote_type: string | null;
-  preferred_technologies: string | null;
-  salary_expectation_min: number | null;
-  salary_expectation_max: number | null;
-  created_at: string;
-  updated_at: string;
-};
+import type { Profile } from "../lib/api";
 
 type ProfileFormProps = {
   initialProfile: Profile | null;
@@ -54,6 +44,7 @@ function toPayload(form: FormState) {
 }
 
 export function ProfileForm({ initialProfile }: ProfileFormProps) {
+  const router = useRouter();
   const [form, setForm] = useState<FormState>(() => toFormState(initialProfile));
   const [message, setMessage] = useState<string>("");
   const [isSaving, setIsSaving] = useState(false);
@@ -81,6 +72,7 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
 
       setMode("update");
       setMessage("Profile saved.");
+      router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Profile request failed.");
     } finally {

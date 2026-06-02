@@ -221,6 +221,10 @@ dd {
   gap: 16px;
 }
 
+.field-row-wide {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .form-actions {
   display: flex;
   align-items: center;
@@ -244,6 +248,43 @@ button:disabled {
   cursor: wait;
 }
 
+.job-list {
+  display: grid;
+  gap: 14px;
+}
+
+.job-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--panel-strong);
+}
+
+.job-card h3 {
+  margin: 0 0 8px;
+}
+
+.job-copy p {
+  margin: 0 0 8px;
+}
+
+.job-meta {
+  display: grid;
+  gap: 8px;
+  min-width: 180px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.job-meta a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+
 @media (max-width: 840px) {
   .app-header,
   .panel-header {
@@ -253,7 +294,8 @@ button:disabled {
 
   .card-grid,
   .summary-grid,
-  .field-row {
+  .field-row,
+  .field-row-wide {
     grid-template-columns: 1fr;
   }
 
@@ -264,5 +306,9 @@ button:disabled {
   .hero-card,
   .panel {
     padding: 20px;
+  }
+
+  .job-card {
+    flex-direction: column;
   }
 }

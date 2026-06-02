@@ -32,11 +32,16 @@ export type Job = {
   updated_at: string;
 };
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const publicApiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const internalApiUrl = process.env.INTERNAL_API_URL ?? "http://backend:8000";
+
+function getApiUrl() {
+  return typeof window === "undefined" ? internalApiUrl : publicApiUrl;
+}
 
 async function readJson<T>(path: string): Promise<T | null> {
   try {
-    const response = await fetch(`${apiUrl}${path}`, { cache: "no-store" });
+    const response = await fetch(`${getApiUrl()}${path}`, { cache: "no-store" });
 
     if (response.status === 404) {
       return null;

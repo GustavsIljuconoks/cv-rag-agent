@@ -198,6 +198,29 @@ dd {
   gap: 16px;
 }
 
+.source-switcher {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.source-chip {
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+}
+
+.source-chip-active {
+  background: var(--accent);
+  color: white;
+}
+
+.source-helper {
+  margin: 0;
+}
+
 .profile-form label {
   display: grid;
   gap: 8px;
@@ -206,13 +229,19 @@ dd {
 }
 
 .profile-form input,
-.profile-form textarea {
+.profile-form textarea,
+.profile-form select {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--panel-strong);
   font: inherit;
+}
+
+.profile-form input:disabled {
+  background: rgba(239, 230, 210, 0.55);
+  cursor: not-allowed;
 }
 
 .field-row {

@@ -24,6 +24,7 @@ export default function RootLayout({
             <nav className="app-nav">
               <Link href="/">Dashboard</Link>
               <Link href="/profile">Profile</Link>
+              <Link href="/jobs">Jobs</Link>
             </nav>
           </header>
           {children}

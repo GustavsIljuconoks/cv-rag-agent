@@ -1,7 +1,7 @@
-import { getBackendHealth, getProfile } from "../lib/api";
+import { getBackendHealth, getJobs, getProfile } from "../lib/api";
 
 export default async function Home() {
-  const [health, profile] = await Promise.all([getBackendHealth(), getProfile()]);
+  const [health, profile, jobs] = await Promise.all([getBackendHealth(), getProfile(), getJobs()]);
 
   return (
     <main className="page">
@@ -33,8 +33,10 @@ export default async function Home() {
 
         <article className="panel">
           <span className="panel-label">Jobs</span>
-          <strong className="status-pill status-empty">not started</strong>
-          <p>The next backend slice should add job ingestion and listing.</p>
+          <strong className={`status-pill ${jobs.length > 0 ? "status-ok" : "status-empty"}`}>
+            {jobs.length > 0 ? `${jobs.length} stored` : "empty"}
+          </strong>
+          <p>{jobs.length > 0 ? "Stored jobs are ready for a list view and later matching." : "No jobs fetched yet."}</p>
         </article>
       </section>
 
@@ -67,6 +69,28 @@ export default async function Home() {
           </div>
         ) : (
           <p>Create the first profile from the Profile page to unlock the next slice.</p>
+        )}
+      </section>
+
+      <section className="panel">
+        <span className="panel-label">Latest Jobs</span>
+        {jobs.length > 0 ? (
+          <div className="job-list">
+            {jobs.slice(0, 5).map((job) => (
+              <article key={job.id} className="job-card">
+                <div>
+                  <h3>{job.title}</h3>
+                  <p>{job.company || "Unknown company"}</p>
+                </div>
+                <div className="job-meta">
+                  <span>{job.location || "Unknown location"}</span>
+                  <span>{job.salary_min ?? "?"} - {job.salary_max ?? "?"}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p>Fetch jobs from the Jobs page after adding Adzuna credentials to the backend environment.</p>
         )}
       </section>
     </main>

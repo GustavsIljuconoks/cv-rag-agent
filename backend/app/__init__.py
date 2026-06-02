@@ -1,0 +1,1 @@
+"""CareerGraph backend application."""

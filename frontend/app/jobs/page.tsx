@@ -11,8 +11,8 @@ export default async function JobsPage() {
           <span className="eyebrow">Jobs</span>
           <h1>Fetch jobs from interchangeable sources and inspect what is stored in PostgreSQL.</h1>
           <p className="hero-copy">
-            This page maps to `POST /jobs/fetch` and `GET /jobs`. Adzuna is implemented, and EURES is stubbed for a
-            Latvia-oriented next step.
+            This page maps to `POST /jobs/fetch` and `GET /jobs`. Adzuna and NVA Latvia are implemented, and EURES
+            remains an explicit stub.
           </p>
         </div>
       </section>

@@ -5,7 +5,7 @@ from typing import Literal
 
 
 class JobsFetchRequest(BaseModel):
-    source: Literal["adzuna", "eures"] = "adzuna"
+    source: Literal["adzuna", "eures", "nva"] = "adzuna"
     keyword: str = Field(min_length=1)
     location: str = Field(min_length=1)
     country: str = Field(min_length=2, max_length=2)

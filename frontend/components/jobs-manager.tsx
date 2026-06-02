@@ -9,7 +9,7 @@ type JobsManagerProps = {
 };
 
 type FetchFormState = {
-  source: "adzuna" | "eures";
+  source: "adzuna" | "eures" | "nva";
   keyword: string;
   location: string;
   country: string;
@@ -26,9 +26,18 @@ const sourcePresets = {
     results_per_page: "10",
     lockCountry: false,
   },
+  nva: {
+    title: "NVA Latvia",
+    helper: "Official Latvia public vacancies source. Search is mapped onto NVA's public vacancy dataset.",
+    keyword: "python",
+    location: "Riga",
+    country: "lv",
+    results_per_page: "10",
+    lockCountry: true,
+  },
   eures: {
     title: "EURES Latvia stub",
-    helper: "Latvia-oriented placeholder. Country is fixed to lv until the real EURES provider is implemented.",
+    helper: "EURES is Latvia-oriented here, but official vacancy extraction is restricted. Use the direct search link for the official portal.",
     keyword: "python",
     location: "Riga",
     country: "lv",
@@ -36,6 +45,19 @@ const sourcePresets = {
     lockCountry: true,
   },
 } as const;
+
+function buildEuresSearchUrl(form: FetchFormState) {
+  const params = new URLSearchParams({
+    lang: "en",
+    keywordsEverywhere: form.keyword,
+  });
+
+  return `https://europa.eu/eures/portal/jv-se/home?${params.toString()}`;
+}
+
+function buildNvaPortalUrl() {
+  return "https://cvvp.nva.gov.lv/#/pub/";
+}
 
 export function JobsManager({ initialJobs }: JobsManagerProps) {
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
@@ -66,12 +88,12 @@ export function JobsManager({ initialJobs }: JobsManagerProps) {
     setIsSubmitting(true);
     setMessage("");
 
-      try {
+    try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/jobs/fetch`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          },
+        },
         body: JSON.stringify({
           source: form.source,
           keyword: form.keyword,
@@ -125,6 +147,13 @@ export function JobsManager({ initialJobs }: JobsManagerProps) {
             </button>
             <button
               type="button"
+              className={`source-chip ${form.source === "nva" ? "source-chip-active" : ""}`}
+              onClick={() => updateField("source", "nva")}
+            >
+              NVA Latvia
+            </button>
+            <button
+              type="button"
               className={`source-chip ${form.source === "eures" ? "source-chip-active" : ""}`}
               onClick={() => updateField("source", "eures")}
             >
@@ -133,6 +162,30 @@ export function JobsManager({ initialJobs }: JobsManagerProps) {
           </div>
 
           <p className="source-helper">{sourcePresets[form.source].helper}</p>
+
+          {form.source === "nva" ? (
+            <div className="source-note">
+              <p>
+                NVA is now wired to the public Latvia vacancies portal. Country is locked to `lv`, and the current UI
+                maps keyword and location into NVA's public search surface.
+              </p>
+              <a href={buildNvaPortalUrl()} target="_blank" rel="noreferrer">
+                Open official NVA portal
+              </a>
+            </div>
+          ) : null}
+
+          {form.source === "eures" ? (
+            <div className="source-note">
+              <p>
+                The official EURES portal is the correct search surface for Latvia-focused browsing unless you have
+                partner access for automated extraction.
+              </p>
+              <a href={buildEuresSearchUrl(form)} target="_blank" rel="noreferrer">
+                Open official EURES search
+              </a>
+            </div>
+          ) : null}
 
           <div className="field-row field-row-wide">
             <label>

@@ -15,5 +15,5 @@ class EuresLatviaJobSource(JobSource):
             raise JobSourceSelectionError("The current EURES stub is intended for Latvia only. Use country 'lv'.")
 
         raise JobSourceNotImplementedError(
-            "EURES Latvia source is stubbed only. Add the real EURES integration next."
+            "Official EURES vacancy extraction is not available here. EURES terms prohibit screen scraping and state that only recognised EURES partner organisations may extract vacancy data via their API or similar technologies."
         )

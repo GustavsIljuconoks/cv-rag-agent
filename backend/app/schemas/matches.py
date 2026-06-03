@@ -30,4 +30,6 @@ class MatchesResponse(BaseModel):
     evaluated_count: int
     last_run_at: datetime | None
     profile_updated_at: datetime | None
+    snapshot_profile_updated_at: datetime | None
+    scoring_version: str | None
     matches: list[MatchRead]

@@ -85,7 +85,9 @@ export function MatchesOverview({ hasJobs, hasProfile, initialMatches }: Matches
             </div>
             <div className="snapshot-meta">
               <span>Last run: {formatDate(matches.last_run_at)}</span>
+              <span>Snapshot profile: {formatDate(matches.snapshot_profile_updated_at)}</span>
               <span>Profile updated: {formatDate(matches.profile_updated_at)}</span>
+              <span>Scoring version: {matches.scoring_version || "not available"}</span>
               {matches.is_stale ? (
                 <button
                   type="button"

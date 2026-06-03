@@ -6,6 +6,7 @@ from app.db.models import CandidateProfile, Job
 MATCH_RUN_JOB_LIMIT = 100
 APPLY_THRESHOLD = 70
 CONSIDER_THRESHOLD = 50
+SCORING_VERSION = "deterministic-v1"
 
 SKILL_WEIGHT = 30
 ROLE_WEIGHT = 20

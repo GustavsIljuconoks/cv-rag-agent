@@ -58,6 +58,8 @@ class MatchesApiTests(unittest.TestCase):
                 "evaluated_count": 0,
                 "last_run_at": None,
                 "profile_updated_at": None,
+                "snapshot_profile_updated_at": None,
+                "scoring_version": None,
                 "matches": [],
             },
         )
@@ -70,6 +72,7 @@ class MatchesApiTests(unittest.TestCase):
         first_run = self.client.post("/matches/run")
         self.assertEqual(first_run.status_code, 200)
         self.assertEqual(first_run.json()["evaluated_count"], 2)
+        self.assertEqual(first_run.json()["scoring_version"], "deterministic-v1")
 
         second_run = self.client.post("/matches/run")
         self.assertEqual(second_run.status_code, 200)
@@ -81,6 +84,8 @@ class MatchesApiTests(unittest.TestCase):
             )
 
         self.assertEqual(len(stored_matches), 2)
+        self.assertTrue(all(match.scoring_version == "deterministic-v1" for match in stored_matches))
+        self.assertTrue(all(match.profile_updated_at_snapshot is not None for match in stored_matches))
 
     def test_get_matches_marks_snapshot_stale_after_profile_update(self) -> None:
         profile = self._create_profile()
@@ -101,6 +106,10 @@ class MatchesApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.json()["has_snapshot"])
         self.assertTrue(response.json()["is_stale"])
+        self.assertEqual(
+            response.json()["snapshot_profile_updated_at"],
+            run_response.json()["snapshot_profile_updated_at"],
+        )
 
     def test_run_matches_only_scores_100_most_recent_jobs(self) -> None:
         self._create_profile()
@@ -117,6 +126,7 @@ class MatchesApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         payload = response.json()
         self.assertEqual(payload["evaluated_count"], 100)
+        self.assertEqual(payload["scoring_version"], "deterministic-v1")
 
         stored_ids = {match["job"]["external_id"] for match in payload["matches"]}
         self.assertNotIn("job-0", stored_ids)

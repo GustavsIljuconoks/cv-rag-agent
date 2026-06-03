@@ -36,7 +36,9 @@ export default async function ProfilePage() {
                         </div>
                         <div className="snapshot-meta">
                             <span>Last run: {matches.last_run_at ? new Date(matches.last_run_at).toLocaleString() : "not available"}</span>
+                            <span>Snapshot profile: {matches.snapshot_profile_updated_at ? new Date(matches.snapshot_profile_updated_at).toLocaleString() : "not available"}</span>
                             <span>Ranked jobs: {matches.evaluated_count}</span>
+                            <span>Scoring version: {matches.scoring_version || "not available"}</span>
                         </div>
                     </div>
                 ) : (

@@ -6,7 +6,12 @@ from app.db.models import CandidateProfile, Job, JobMatch
 from app.db.session import get_db
 from app.schemas.jobs import JobRead
 from app.schemas.matches import MatchRead, MatchesResponse
-from app.services.matching import MATCH_RUN_JOB_LIMIT, derive_transient_match_details, match_jobs
+from app.services.matching import (
+    MATCH_RUN_JOB_LIMIT,
+    SCORING_VERSION,
+    derive_transient_match_details,
+    match_jobs,
+)
 
 router = APIRouter(prefix="/matches", tags=["matches"])
 
@@ -37,6 +42,8 @@ def run_matches(db: Session = Depends(get_db)) -> MatchesResponse:
                 interest_score=result.interest_score,
                 explanation=result.explanation,
                 recommendation=result.recommendation,
+                scoring_version=SCORING_VERSION,
+                profile_updated_at_snapshot=profile.updated_at,
             )
         )
 
@@ -56,6 +63,8 @@ def get_matches(db: Session = Depends(get_db)) -> MatchesResponse:
             evaluated_count=0,
             last_run_at=None,
             profile_updated_at=None,
+            snapshot_profile_updated_at=None,
+            scoring_version=None,
             matches=[],
         )
 
@@ -72,6 +81,8 @@ def _build_matches_response(db: Session, profile: CandidateProfile) -> MatchesRe
         .where(JobMatch.candidate_profile_id == profile.id)
         .order_by(JobMatch.match_score.desc(), Job.posted_at.desc().nullslast(), Job.created_at.desc())
     ).all()
+    snapshot_profile_updated_at = rows[0][0].profile_updated_at_snapshot if rows else None
+    scoring_version = rows[0][0].scoring_version if rows else None
 
     matches: list[MatchRead] = []
     for job_match, job in rows:
@@ -99,10 +110,14 @@ def _build_matches_response(db: Session, profile: CandidateProfile) -> MatchesRe
 
     return MatchesResponse(
         has_snapshot=bool(matches),
-        is_stale=bool(last_run_at and profile.updated_at > last_run_at),
+        is_stale=bool(
+            snapshot_profile_updated_at and profile.updated_at > snapshot_profile_updated_at
+        ),
         evaluated_count=len(matches),
         last_run_at=last_run_at,
         profile_updated_at=profile.updated_at,
+        snapshot_profile_updated_at=snapshot_profile_updated_at,
+        scoring_version=scoring_version,
         matches=matches,
     )
 

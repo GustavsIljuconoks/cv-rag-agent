@@ -57,6 +57,8 @@ export type MatchesResponse = {
   evaluated_count: number;
   last_run_at: string | null;
   profile_updated_at: string | null;
+  snapshot_profile_updated_at: string | null;
+  scoring_version: string | null;
   matches: Match[];
 };
 
@@ -69,6 +71,8 @@ const emptyMatchesResponse: MatchesResponse = {
   evaluated_count: 0,
   last_run_at: null,
   profile_updated_at: null,
+  snapshot_profile_updated_at: null,
+  scoring_version: null,
   matches: [],
 };
 

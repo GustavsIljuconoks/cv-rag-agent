@@ -77,6 +77,11 @@ class JobMatch(Base):
     interest_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     explanation: Mapped[str | None] = mapped_column(Text, nullable=True)
     recommendation: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    scoring_version: Mapped[str] = mapped_column(String(50), nullable=False)
+    profile_updated_at_snapshot: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),

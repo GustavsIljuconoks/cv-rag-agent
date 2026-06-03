@@ -1,5 +1,6 @@
 import json
 import re
+import unicodedata
 from datetime import datetime
 from html import unescape
 from urllib.error import HTTPError, URLError
@@ -41,15 +42,35 @@ def parse_salary_range(value: str | None) -> tuple[int | None, int | None]:
         return None, None
 
     compact = value.replace(" ", "").replace("\xa0", "")
+    if _looks_hourly_salary(compact):
+        return None, None
+
     matches = re.findall(r"\d+(?:[.,]\d+)?", compact)
     if not matches:
         return None, None
 
-    values = [int(float(match.replace(",", "."))) for match in matches]
+    values = [round(float(match.replace(",", "."))) for match in matches]
     if len(values) == 1:
         return values[0], values[0]
 
     return min(values), max(values)
+
+
+def _looks_hourly_salary(value: str) -> bool:
+    normalized = _normalize_text(value)
+    return any(
+        marker in normalized
+        for marker in {"stund", "hour", "perhour", "eur/h", "euro/h", "/h"}
+    )
+
+
+def _normalize_text(value: str) -> str:
+    lowered = value.strip().lower()
+    decomposed = unicodedata.normalize("NFKD", lowered)
+    without_diacritics = "".join(
+        char for char in decomposed if not unicodedata.combining(char)
+    )
+    return re.sub(r"\s+", " ", without_diacritics).strip()
 
 
 class NvaLatviaJobSource(JobSource):
@@ -103,7 +124,7 @@ class NvaLatviaJobSource(JobSource):
             "limit": params.results_per_page,
             "offset": (params.page - 1) * params.results_per_page,
         }
-        if self._is_remote_query(params.location):
+        if self._matches_remote_query(params.location):
             base_query["ir_attalinati_veicams_darbs"] = "true"
 
         candidates = self._build_search_candidates(params.keyword, params.location)
@@ -125,7 +146,7 @@ class NvaLatviaJobSource(JobSource):
 
     def _build_search_text(self, keyword: str, location: str) -> str:
         parts = self._unique_parts(keyword.strip(), location.strip())
-        if parts and self._is_remote_query(parts[-1]):
+        if parts and self._matches_remote_query(parts[-1]):
             parts = parts[:-1]
 
         return " ".join(parts).strip()
@@ -140,7 +161,7 @@ class NvaLatviaJobSource(JobSource):
             candidates.append(combined)
 
         for candidate in self._unique_parts(keyword_value, location_value):
-            if candidate and not self._is_remote_query(candidate) and candidate not in candidates:
+            if candidate and not self._matches_remote_query(candidate) and candidate not in candidates:
                 candidates.append(candidate)
 
         return candidates
@@ -151,7 +172,7 @@ class NvaLatviaJobSource(JobSource):
         for value in values:
             if not value:
                 continue
-            normalized = value.lower()
+            normalized = _normalize_text(value)
             if normalized in seen:
                 continue
             seen.add(normalized)
@@ -162,6 +183,16 @@ class NvaLatviaJobSource(JobSource):
     def _is_remote_query(self, value: str) -> bool:
         normalized = value.strip().lower()
         return normalized in {"remote", "remote only", "attalinati", "attalināts", "attalinati veicams darbs"}
+
+    def _matches_remote_query(self, value: str) -> bool:
+        normalized = _normalize_text(value)
+        return normalized in {
+            "remote",
+            "remote only",
+            "attalinati",
+            "attalinats",
+            "attalinati veicams darbs",
+        }
 
     def _request_json(self, path: str) -> object:
         request = Request(

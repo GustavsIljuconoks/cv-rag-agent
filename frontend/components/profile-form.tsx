@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-import type { Profile } from "../lib/api";
+import type { MatchesResponse, Profile } from "../lib/api";
 
 type ProfileFormProps = {
   initialProfile: Profile | null;
+  initialMatches: MatchesResponse;
 };
 
 type FormState = {
@@ -43,7 +44,7 @@ function toPayload(form: FormState) {
   };
 }
 
-export function ProfileForm({ initialProfile }: ProfileFormProps) {
+export function ProfileForm({ initialProfile, initialMatches }: ProfileFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<FormState>(() => toFormState(initialProfile));
   const [message, setMessage] = useState<string>("");
@@ -55,6 +56,8 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
     setIsSaving(true);
     setMessage("");
 
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+    const shouldRerunMatching = submitter?.dataset.intent === "save-and-rerun";
     const method = mode === "create" ? "POST" : "PUT";
 
     try {
@@ -70,8 +73,33 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
         throw new Error(`Profile request failed with ${response.status}`);
       }
 
+      if (shouldRerunMatching) {
+        const matchesResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/matches/run`, {
+          method: "POST",
+        });
+        const matchesPayload = (await matchesResponse.json()) as MatchesResponse | { detail?: string };
+
+        if (!matchesResponse.ok) {
+          throw new Error(
+            ("detail" in matchesPayload && matchesPayload.detail) || `Match run failed with ${matchesResponse.status}`
+          );
+        }
+
+        const snapshot = matchesPayload as MatchesResponse;
+        setMessage(
+          snapshot.has_snapshot
+            ? `Profile saved and matching reran for ${snapshot.evaluated_count} ranked jobs.`
+            : "Profile saved. Matching reran, but there are no jobs to rank yet."
+        );
+      } else {
+        setMessage(
+          initialMatches.has_snapshot
+            ? "Profile saved. Existing matches are now stale until you rerun matching."
+            : "Profile saved."
+        );
+      }
+
       setMode("update");
-      setMessage("Profile saved.");
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Profile request failed.");
@@ -161,8 +189,19 @@ export function ProfileForm({ initialProfile }: ProfileFormProps) {
           <button type="submit" disabled={isSaving}>
             {isSaving ? "Saving..." : mode === "create" ? "Create profile" : "Save changes"}
           </button>
+          <button
+            type="submit"
+            data-intent="save-and-rerun"
+            className="button-secondary"
+            disabled={isSaving}
+          >
+            {isSaving ? "Saving..." : "Save and rerun matching"}
+          </button>
           <span className="form-message">{message}</span>
         </div>
+        {initialMatches.has_snapshot ? (
+          <p className="form-hint">Saving profile changes will mark the current match snapshot stale until rerun.</p>
+        ) : null}
       </form>
     </section>
   );

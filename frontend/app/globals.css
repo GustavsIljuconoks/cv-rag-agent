@@ -300,6 +300,18 @@ button:disabled {
   cursor: wait;
 }
 
+.button-secondary {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--ink);
+}
+
+.form-hint {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
 .match-actions {
   display: flex;
   gap: 12px;

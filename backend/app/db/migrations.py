@@ -1,10 +1,22 @@
+import sys
 from pathlib import Path
-
-from alembic import command
-from alembic.config import Config
 from sqlalchemy import create_engine, inspect
 
 from app.config import settings
+
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+_ORIGINAL_SYS_PATH = list(sys.path)
+
+try:
+    sys.path = [
+        entry
+        for entry in sys.path
+        if Path(entry or ".").resolve() != BACKEND_ROOT
+    ]
+    from alembic import command
+    from alembic.config import Config
+finally:
+    sys.path = _ORIGINAL_SYS_PATH
 
 PROJECT_TABLES = {
     "applications",
@@ -39,9 +51,8 @@ def run_migrations() -> None:
 
 
 def _build_alembic_config() -> Config:
-    backend_root = Path(__file__).resolve().parents[2]
-    config = Config(str(backend_root / "alembic.ini"))
-    config.set_main_option("script_location", str(backend_root / "alembic"))
+    config = Config(str(BACKEND_ROOT / "alembic.ini"))
+    config.set_main_option("script_location", str(BACKEND_ROOT / "alembic"))
     config.set_main_option("sqlalchemy.url", settings.database_url)
     return config
 

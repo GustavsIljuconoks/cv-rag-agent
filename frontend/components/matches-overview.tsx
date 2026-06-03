@@ -86,6 +86,16 @@ export function MatchesOverview({ hasJobs, hasProfile, initialMatches }: Matches
             <div className="snapshot-meta">
               <span>Last run: {formatDate(matches.last_run_at)}</span>
               <span>Profile updated: {formatDate(matches.profile_updated_at)}</span>
+              {matches.is_stale ? (
+                <button
+                  type="button"
+                  onClick={handleRunMatching}
+                  disabled={isRunning || !hasJobs}
+                  className="button-secondary"
+                >
+                  {isRunning ? "Running..." : "Rerun matching now"}
+                </button>
+              ) : null}
             </div>
           </div>
 

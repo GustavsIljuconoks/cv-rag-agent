@@ -3,7 +3,6 @@ from app.api.routes.matches import router as matches_router
 from app.api.routes.profile import router as profile_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.db import init_db
 
 app = FastAPI(title="CareerGraph API")
 
@@ -17,11 +16,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    init_db()
 
 
 app.include_router(profile_router)

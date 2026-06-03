@@ -1,6 +1,6 @@
 from app.db.base import Base
 from app.db.models import Application, CandidateProfile, Job, JobMatch
-from app.db.session import SessionLocal, engine, get_db, init_db
+from app.db.session import SessionLocal, engine, get_db
 
 __all__ = [
     "Application",
@@ -11,5 +11,4 @@ __all__ = [
     "SessionLocal",
     "engine",
     "get_db",
-    "init_db",
 ]

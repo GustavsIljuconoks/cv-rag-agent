@@ -44,6 +44,21 @@ Qdrant is available at:
 http://localhost:6333/dashboard
 ```
 
+## Database Migrations
+
+For local backend work outside Docker, run migrations before starting the API:
+
+```powershell
+cd backend
+.\.venv\Scripts\python.exe -m app.db.migrations
+```
+
+The initial baseline migration lives in:
+
+```txt
+backend/alembic/versions/0001_initial_schema.py
+```
+
 ## Initial Layout
 
 ```txt

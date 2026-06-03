@@ -1,4 +1,5 @@
 from app.api.routes.jobs import router as jobs_router
+from app.api.routes.matches import router as matches_router
 from app.api.routes.profile import router as profile_router
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,6 +26,7 @@ def on_startup() -> None:
 
 app.include_router(profile_router)
 app.include_router(jobs_router)
+app.include_router(matches_router)
 
 
 @app.get("/health")

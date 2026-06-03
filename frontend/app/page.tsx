@@ -1,7 +1,13 @@
-import { getBackendHealth, getJobs, getProfile } from "../lib/api";
+import { MatchesOverview } from "../components/matches-overview";
+import { getBackendHealth, getJobs, getMatches, getProfile } from "../lib/api";
 
 export default async function Home() {
-  const [health, profile, jobs] = await Promise.all([getBackendHealth(), getProfile(), getJobs()]);
+  const [health, profile, jobs, matches] = await Promise.all([
+    getBackendHealth(),
+    getProfile(),
+    getJobs(),
+    getMatches(),
+  ]);
 
   return (
     <main className="page">
@@ -93,6 +99,8 @@ export default async function Home() {
           <p>Fetch jobs from the Jobs page after adding Adzuna credentials to the backend environment.</p>
         )}
       </section>
+
+      <MatchesOverview hasJobs={jobs.length > 0} hasProfile={Boolean(profile)} initialMatches={matches} />
     </main>
   );
 }

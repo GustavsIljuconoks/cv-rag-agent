@@ -63,6 +63,7 @@ body {
 
 .brand-copy,
 .hero-copy,
+.panel-copy,
 .panel p,
 .profile-summary p,
 .form-message,
@@ -299,9 +300,51 @@ button:disabled {
   cursor: wait;
 }
 
+.match-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
 .job-list {
   display: grid;
   gap: 14px;
+}
+
+.snapshot-banner {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+}
+
+.snapshot-banner strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.snapshot-banner p {
+  margin: 0;
+}
+
+.snapshot-banner-fresh {
+  background: rgba(223, 242, 235, 0.55);
+}
+
+.snapshot-banner-stale {
+  background: rgba(239, 230, 210, 0.7);
+}
+
+.snapshot-meta {
+  display: grid;
+  gap: 6px;
+  min-width: 200px;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .job-card {
@@ -318,8 +361,43 @@ button:disabled {
   margin: 0 0 8px;
 }
 
+.match-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
 .job-copy p {
   margin: 0 0 8px;
+}
+
+.recommendation-pill {
+  display: inline-flex;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.recommendation-apply {
+  background: var(--accent);
+  color: white;
+}
+
+.recommendation-consider {
+  background: rgba(31, 111, 95, 0.14);
+  color: var(--accent);
+}
+
+.recommendation-skip {
+  background: var(--warn-soft);
+  color: #7b5d25;
+}
+
+.match-supplement {
+  font-size: 0.95rem;
 }
 
 .job-meta {
@@ -353,6 +431,11 @@ button:disabled {
   .source-note {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .snapshot-banner,
+  .match-card-header {
+    flex-direction: column;
   }
 
   .app-shell {
